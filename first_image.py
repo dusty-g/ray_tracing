@@ -1,4 +1,6 @@
-# image width and height
+from tqdm import tqdm
+from vec3_class import Color
+# image width and height 
 image_width = 256
 image_height = 256
 
@@ -6,14 +8,12 @@ image_height = 256
 print(f"P3\n{image_width} {image_height}\n255")
 
 # for loops over the image from top to bottom
-for j in range(image_height - 1, -1, -1):
+# for j in range(image_height - 1, -1, -1):
+# use tqdm
+for j in tqdm(range(image_height - 1, -1, -1)): 
     for i in range(image_width):
-        r = i / (image_width - 1)
-        g = j / (image_height - 1)
-        b = 0.25
-
-        ir = int(255.99 * r)
-        ig = int(255.99 * g)
-        ib = int(255.99 * b)
-        print(f"{ir} {ig} {ib}")
+        
+        color = Color(i / (image_width - 1), j / (image_height - 1), 0.25)
+        
+        print(color.write_color())
 
