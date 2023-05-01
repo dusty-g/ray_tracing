@@ -31,7 +31,7 @@ class Vec3:
         return self
     def __add__(self, vec3):
         return Vec3(self.e[0] + vec3.e[0], self.e[1] + vec3.e[1], self.e[2] + vec3.e[2])
-    def __sub____(self, vec3):
+    def __sub__(self, vec3):
         return Vec3(self.e[0] - vec3.e[0], self.e[1] - vec3.e[1], self.e[2] - vec3.e[2])
     # overload imul
     def __imul__(self, t): 
@@ -39,11 +39,20 @@ class Vec3:
         self.e[1] *= t
         self.e[2] *= t
         return self
-    def __mul__(self, vec3):
-        return Vec3(self.e[0]*vec3.e[0], self.e[1]*vec3.e[1], self.e[2]*vec3.e[2])
+    def __mul__(self, other):
+        if isinstance(other, Vec3):
+            return Vec3(self.e[0]*other.e[0], self.e[1]*other.e[1], self.e[2]*other.e[2])
+        elif isinstance(other, (int, float)):
+            return Vec3(self.e[0]* other, self.e[1] * other, self.e[2] * other)
+        else:
+            raise TypeError("Operand must be either Vec3 or int/float.")
+    def __rmul__(self, other):
+        return self * other
     def __itruediv__(self, t):
         self *= 1/t
         return self
+    def __truediv__(self, t):
+        return Vec3(self.e[0] / t, self.e[1] / t, self.e[2] / t)
     def length(self):
         return math.sqrt(self.length_squared())
     def length_squared(self):
