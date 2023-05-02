@@ -15,14 +15,14 @@ def ray_color(ray: Ray):
 
 def hit_sphere(center: Point3, radius, r: Ray):
     oc = r.origin - center
-    a = r.direction.dot(r.direction)
-    b = 2.0 * oc.dot(r.direction)
-    c = oc.dot(oc) - radius * radius
-    discriminant = b * b - 4 * a * c
+    a = r.direction.length_squared()
+    half_b = oc.dot(r.direction)
+    c = oc.length_squared() - radius * radius
+    discriminant = half_b * half_b - a * c
     if(discriminant < 0):
         return -1.0
     else:
-        return (-b - sqrt(discriminant))/(2.0 * a)
+        return (-half_b - sqrt(discriminant))/ a
 
 
 
