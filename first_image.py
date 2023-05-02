@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from vec3_class import Color
+from vec3 import Color
 # image width and height 
 image_width = 256
 image_height = 256

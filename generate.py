@@ -1,5 +1,5 @@
-from vec3_class import Color, Point3, Vec3
-from ray_class import Ray
+from vec3 import Color, Point3, Vec3
+from ray import Ray
 from tqdm import tqdm
 from math import sqrt
 
