@@ -1,4 +1,5 @@
 import math
+import random
 
 def clamp(x, minimum, maximum):
     return max(minimum, min(maximum, x))
@@ -76,6 +77,21 @@ class Vec3:
         b *= scale
 
         return f"{int(256 * clamp(r,0.0,0.999))} {int(256 * clamp(g, 0.0, 0.999))} {int(256 * clamp(b, 0.0, 0.999))}"
+    # static create random point in unit cube
+    @staticmethod
+    def random():
+        return Vec3(random.random(), random.random(), random.random())
+    
+    @staticmethod
+    def random(min: float, max: float):
+        return Vec3(random.uniform(min, max), random.uniform(min, max), random.uniform(min, max))
 
+    @staticmethod
+    def random_in_unit_sphere():
+        while True:
+            candidate_point: Vec3 = Vec3.random()
+            if(candidate_point.length_squared() >= 1):
+                continue
+            return candidate_point
 Point3 = Vec3
 Color = Vec3 
