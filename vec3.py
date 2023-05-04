@@ -1,5 +1,8 @@
 import math
 
+def clamp(x, minimum, maximum):
+    return max(minimum, min(maximum, x))
+
 class Vec3:
     def __init__(self, e0=0.0, e1=0.0, e2=0.0):
         self.e = [e0, e1, e2]
@@ -63,7 +66,16 @@ class Vec3:
         return Vec3(self.e[1] * vec3.e[2] - self.e[2] * vec3.e[1], self.e[2] * vec3.e[0] - self.e[0] * vec3.e[2], self.e[0] * vec3.e[1] - self.e[1] * vec3.e[0])
     def unit_vector(self):
         return self / self.length()
-    def write_color(self):
-        return f"{int(255.999 * self.e[0])} {int(255.999 * self.e[1])} {int(255.999 * self.e[2])}"
+    def write_color(self, samples_per_pixel = 1):
+        r, g, b = self.e
+
+        scale = 1.0 / samples_per_pixel
+
+        r *= scale
+        g *= scale
+        b *= scale
+
+        return f"{int(256 * clamp(r,0.0,0.999))} {int(256 * clamp(g, 0.0, 0.999))} {int(256 * clamp(b, 0.0, 0.999))}"
+
 Point3 = Vec3
 Color = Vec3 

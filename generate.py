@@ -1,10 +1,11 @@
+from camera import Camera
 from vec3 import Color, Point3, Vec3
 from ray import Ray
 from tqdm import tqdm
 from math import sqrt
 from hittable import Sphere, HittableList, Torus
 from rtweekend import infinity, pi, degrees_to_radians
-
+import random
 
 
 def ray_color(ray: Ray, world: HittableList):
@@ -35,23 +36,21 @@ world.add(Sphere(Point3(0,-100.5,-1), 100))
 aspect_ratio = 16.0 / 9.0
 image_width = 400
 image_height = int(image_width / aspect_ratio)
+samples_per_pixel = 100
 
 # camera
-viewport_height = 2.0
-viewport_width = aspect_ratio * viewport_height
-focal_length = 1
-
-origin = Point3(0,0,0)
-horizontal = Vec3(viewport_width, 0, 0)
-vertical = Vec3(0, viewport_height, 0)
-lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3(0, 0, focal_length)
+camera = Camera()
 
 # render
 print(f"P3\n{image_width} {image_height}\n255")
 for j in tqdm(range(image_height-1, -1, -1)):
     for i in range(image_width):
-        u = i / (image_width - 1)
-        v = j / (image_height - 1)
-        r = Ray(origin, lower_left_corner + u*horizontal + v*vertical - origin)
-        pixel_color: Color = ray_color(r, world)
-        print(pixel_color.write_color())
+        pixel_color = Color(0,0,0)
+        for sample in range(samples_per_pixel):
+            
+            u = (i + random.random()) / (image_width - 1)
+            v = (j + random.random()) / (image_height - 1)
+            r = camera.get_ray(u, v)
+            pixel_color += ray_color(r, world)
+        
+        print(pixel_color.write_color(samples_per_pixel))
