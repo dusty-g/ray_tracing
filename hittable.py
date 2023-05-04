@@ -19,7 +19,7 @@ class Hittable:
         raise NotImplementedError
     
 class Torus(Hittable):
-    def __init__(self, center: Point3, major_radius: float, minor_radius: float, max_steps: int = 100, epsilon: float = 1e-3, t_max: float = 1e3):
+    def __init__(self, center: Point3, major_radius: float, minor_radius: float, max_steps: int = 200, epsilon: float = 1e-3, t_max: float = 1e3):
         self.center = center
         self.major_radius = major_radius
         self.minor_radius = minor_radius
@@ -29,7 +29,7 @@ class Torus(Hittable):
     
     def hit(self, r: Ray, t_min: float, t_max: float) -> Optional[HitRecord]:
         t = self.hit_torus(r)
-        if t > 0:
+        if t > 0 and t_min <= t <= t_max:
             p = r.at(t)
             outward_normal = self.torus_normal(p)
             hit_record = HitRecord(point=p, normal=outward_normal, t=t, front_face=True)

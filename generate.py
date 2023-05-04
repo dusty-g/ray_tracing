@@ -9,23 +9,14 @@ import random
 
 
 def ray_color(ray: Ray, world: HittableList):
-    hit_record = world.hit(r, 0, infinity)
+    hit_record = world.hit(r, 0.001, infinity)
     if hit_record:
         return 0.5 * (hit_record.normal + Color(1,1,1))
     unit_direction = ray.direction.unit_vector()
     t = 0.5*(unit_direction[1] + 1.0)
     return (1.0 - t)*Color(1.0, 1.0, 1.0) + t*Color(0.5,0.7,1)
 
-def hit_sphere(center: Point3, radius, r: Ray):
-    oc = r.origin - center
-    a = r.direction.length_squared()
-    half_b = oc.dot(r.direction)
-    c = oc.length_squared() - radius * radius
-    discriminant = half_b * half_b - a * c
-    if(discriminant < 0):
-        return -1.0
-    else:
-        return (-half_b - sqrt(discriminant))/ a
+
 
 # world
 world = HittableList()
