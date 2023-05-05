@@ -11,11 +11,11 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 def ray_color(ray: Ray, world: HittableList, depth: int):
-    hit_record = world.hit(ray, 0, infinity)
+    hit_record = world.hit(ray, 0.001, infinity)
     if depth <= 0:
         return Color(0,0,0)
     if hit_record:
-        target: Point3 = hit_record.point + hit_record.normal + Vec3.random_in_unit_sphere()
+        target: Point3 = hit_record.point + hit_record.normal + Vec3.random_unit_vector()
         return 0.5 * ray_color(Ray(hit_record.point, target - hit_record.point), world, depth - 1)
     unit_direction = ray.direction.unit_vector()
     t = 0.5*(unit_direction[1] + 1.0)
@@ -27,13 +27,14 @@ def ray_color(ray: Ray, world: HittableList, depth: int):
 world = HittableList()
 world.add(Sphere(Point3(0,0,-1), 0.5))
 world.add(Sphere(Point3(0,-100.5,-1), 100))
+# world.add(Torus(Point3(0,0,-1.5), 0.5, 0.2))
 
 # image
 aspect_ratio = 16.0 / 9.0
 image_width = 400
 image_height = int(image_width / aspect_ratio)
 samples_per_pixel = 100
-max_depth: int = 5
+max_depth: int = 50
 
 # camera
 camera = Camera()

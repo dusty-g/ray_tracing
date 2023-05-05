@@ -71,10 +71,10 @@ class Vec3:
         r, g, b = self.e
 
         scale = 1.0 / samples_per_pixel
-
-        r *= scale
-        g *= scale
-        b *= scale
+        # gamma = 2
+        r = math.sqrt(scale * r)
+        g = math.sqrt(scale * g)
+        b = math.sqrt(scale * b)
 
         return f"{int(256 * clamp(r,0.0,0.999))} {int(256 * clamp(g, 0.0, 0.999))} {int(256 * clamp(b, 0.0, 0.999))}"
     # static create random point in unit cube
@@ -90,5 +90,9 @@ class Vec3:
             if(candidate_point.length_squared() >= 1):
                 continue
             return candidate_point
+    @staticmethod
+    def random_unit_vector():
+        vector: Vec3 = Vec3.random_in_unit_sphere()
+        return vector.unit_vector()
 Point3 = Vec3
 Color = Vec3 
