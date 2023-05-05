@@ -6,6 +6,8 @@ from math import sqrt
 from hittable import Sphere, HittableList, Torus
 from rtweekend import infinity, pi, degrees_to_radians
 import random
+from typing import List, Tuple
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
 def ray_color(ray: Ray, world: HittableList, depth: int):
@@ -31,21 +33,41 @@ aspect_ratio = 16.0 / 9.0
 image_width = 400
 image_height = int(image_width / aspect_ratio)
 samples_per_pixel = 100
-max_depth: int = 50
+max_depth: int = 5
 
 # camera
 camera = Camera()
 
-# render
-print(f"P3\n{image_width} {image_height}\n255")
-for j in tqdm(range(image_height-1, -1, -1)):
-    for i in range(image_width):
+
+def render_row(width: int, height: int, samples_per_pixel: int, camera: Camera, world: HittableList, row: int) -> Tuple[int, List[Vec3]]:
+    row_pixels = []
+    for x in range(width):
         pixel_color = Color(0,0,0)
         for sample in range(samples_per_pixel):
-            
-            u = (i + random.random()) / (image_width - 1)
-            v = (j + random.random()) / (image_height - 1)
-            r = camera.get_ray(u, v)
+            u = (x + random.random()) / (width - 1)
+            v = (row + random.random()) / (height - 1)
+            r = camera.get_ray(u,v)
             pixel_color += ray_color(r, world, max_depth)
-        
-        print(pixel_color.write_color(samples_per_pixel))
+        row_pixels.append(pixel_color)
+    return row, row_pixels
+
+def main():
+
+    with ProcessPoolExecutor() as executor:
+        futures = [executor.submit(render_row, image_width, image_height, samples_per_pixel, camera, world, row) for row in range(image_height)]
+        rendered_rows = [None for _ in range(image_height)]
+        progress_bar = tqdm(total=image_height, desc="Rendering", ncols=100)
+        for f in as_completed(futures):
+            row, row_pixels = f.result()
+            rendered_rows[row] = row_pixels # type: ignore
+            progress_bar.update(1)
+        progress_bar.close()
+    # render
+    print(f"P3\n{image_width} {image_height}\n255")
+
+    for row in reversed(rendered_rows):
+        for color in row: # type: ignore
+            print(color.write_color(samples_per_pixel))
+
+if __name__ == '__main__':
+    main()
