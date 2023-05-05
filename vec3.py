@@ -78,18 +78,15 @@ class Vec3:
 
         return f"{int(256 * clamp(r,0.0,0.999))} {int(256 * clamp(g, 0.0, 0.999))} {int(256 * clamp(b, 0.0, 0.999))}"
     # static create random point in unit cube
-    @staticmethod
-    def random():
-        return Vec3(random.random(), random.random(), random.random())
     
     @staticmethod
-    def random(min: float, max: float):
+    def random(min: float = 0, max: float = 1):
         return Vec3(random.uniform(min, max), random.uniform(min, max), random.uniform(min, max))
 
     @staticmethod
     def random_in_unit_sphere():
         while True:
-            candidate_point: Vec3 = Vec3.random()
+            candidate_point: Vec3 = Vec3.random(-1, 1)
             if(candidate_point.length_squared() >= 1):
                 continue
             return candidate_point

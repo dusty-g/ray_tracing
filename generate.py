@@ -8,10 +8,13 @@ from rtweekend import infinity, pi, degrees_to_radians
 import random
 
 
-def ray_color(ray: Ray, world: HittableList):
-    hit_record = world.hit(r, 0.001, infinity)
+def ray_color(ray: Ray, world: HittableList, depth: int):
+    hit_record = world.hit(ray, 0, infinity)
+    if depth <= 0:
+        return Color(0,0,0)
     if hit_record:
-        return 0.5 * (hit_record.normal + Color(1,1,1))
+        target: Point3 = hit_record.point + hit_record.normal + Vec3.random_in_unit_sphere()
+        return 0.5 * ray_color(Ray(hit_record.point, target - hit_record.point), world, depth - 1)
     unit_direction = ray.direction.unit_vector()
     t = 0.5*(unit_direction[1] + 1.0)
     return (1.0 - t)*Color(1.0, 1.0, 1.0) + t*Color(0.5,0.7,1)
@@ -28,6 +31,7 @@ aspect_ratio = 16.0 / 9.0
 image_width = 400
 image_height = int(image_width / aspect_ratio)
 samples_per_pixel = 100
+max_depth: int = 50
 
 # camera
 camera = Camera()
@@ -42,6 +46,6 @@ for j in tqdm(range(image_height-1, -1, -1)):
             u = (i + random.random()) / (image_width - 1)
             v = (j + random.random()) / (image_height - 1)
             r = camera.get_ray(u, v)
-            pixel_color += ray_color(r, world)
+            pixel_color += ray_color(r, world, max_depth)
         
         print(pixel_color.write_color(samples_per_pixel))
