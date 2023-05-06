@@ -94,5 +94,11 @@ class Vec3:
     def random_unit_vector():
         vector: Vec3 = Vec3.random_in_unit_sphere()
         return vector.unit_vector()
+    
+    def near_zero(self):
+        s = 1e-8
+        return all(math.isclose(_, 0, abs_tol=s) for _ in self.e)
+        
+
 Point3 = Vec3
 Color = Vec3 

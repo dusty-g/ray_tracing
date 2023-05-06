@@ -1,14 +1,17 @@
 from math import sqrt
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from material import Material
 from vec3 import Point3, Vec3
 from ray import Ray
 
 
 
 class HitRecord:
-    def __init__(self, point: Point3, normal: Vec3, t: float, front_face: bool):
+    def __init__(self, point: Point3, normal: Vec3, material: 'Material', t: float, front_face: bool):
         self.point = point
         self.normal = normal
+        self.material = material
         self.t = t
         self.front_face = front_face
     def set_face_normal(self, r: Ray, outward_normal: Vec3):
@@ -19,20 +22,21 @@ class Hittable:
         raise NotImplementedError
     
 class Torus(Hittable):
-    def __init__(self, center: Point3, major_radius: float, minor_radius: float, max_steps: int = 200, epsilon: float = 1e-3, t_max: float = 1e3):
+    def __init__(self, center: Point3, major_radius: float, minor_radius: float, material: 'Material', max_steps: int = 200, epsilon: float = 1e-3, t_max: float = 1e3):
         self.center = center
         self.major_radius = major_radius
         self.minor_radius = minor_radius
         self.max_steps = max_steps
         self.epsilon = epsilon
         self.t_max = t_max
+        self.material = material
     
     def hit(self, r: Ray, t_min: float, t_max: float) -> Optional[HitRecord]:
         t = self.hit_torus(r)
         if t > 0 and t_min <= t <= t_max:
             p = r.at(t)
             outward_normal = self.torus_normal(p)
-            hit_record = HitRecord(point=p, normal=outward_normal, t=t, front_face=True)
+            hit_record = HitRecord(point=p, normal=outward_normal, material=self.material, t=t, front_face=True)
             hit_record.set_face_normal(r, outward_normal)
             return hit_record
         return None
@@ -66,9 +70,10 @@ class Torus(Hittable):
         return Vec3(nx, ny, nz).unit_vector()
 
 class Sphere(Hittable):
-    def __init__(self, center: Point3, radius: float):
+    def __init__(self, center: Point3, radius: float, material: 'Material'):
         self.center = center
         self.radius = radius
+        self.material = material
     def hit(self, r: Ray, t_min: float, t_max: float) -> Optional[HitRecord]:
         oc = r.origin - self.center
         a = r.direction.length_squared()
@@ -89,7 +94,7 @@ class Sphere(Hittable):
         t = root
         p = r.at(t)
         outward_normal = (p - self.center) / self.radius
-        rec = HitRecord(point=p, normal=outward_normal, t=t, front_face = True)
+        rec = HitRecord(point=p, normal=outward_normal, material=self.material, t=t, front_face = True)
         rec.set_face_normal(r, outward_normal)
         return rec
 
