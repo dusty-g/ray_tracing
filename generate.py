@@ -1,5 +1,5 @@
 from camera import Camera
-from material import Lambertian, Material, Metal
+from material import Dialectric, Lambertian, Material, Metal
 from vec3 import Color, Point3, Vec3
 from ray import Ray
 from tqdm import tqdm
@@ -30,17 +30,15 @@ def ray_color(ray: Ray, world: HittableList, depth: int):
 
 # world
 world = HittableList()
-material_ground: Material = Lambertian(Color(0.8, 0.8, 0.0))
-material_center: Material = Lambertian(Color(0.7, 0.3, 0.3))
+material_ground = Lambertian(Color(0.8, 0.8, 0.0))
+material_center = Lambertian(Color(0.1, 0.2, 0.5))
+material_left = Dialectric(1.5)  # Assuming Dielectric class is already defined
+material_right = Metal(Color(0.8, 0.6, 0.2), 0.0)
 
-material_left: Material = Metal(Color(0.8, 0.8, 0.8), 0.3)
-material_right: Material = Metal(Color(0.8, 0.6, 0.2), 1)
-
-world.add(Sphere(Point3(0,-100.5,-1), 100, material_ground))
+world.add(Sphere(Point3(0, -100.5, -1), 100, material_ground))
 world.add(Sphere(Point3(0, 0, -1), 0.5, material_center))
 world.add(Sphere(Point3(-1, 0, -1), 0.5, material_left))
 world.add(Sphere(Point3(1, 0, -1), 0.5, material_right))
-# world.add(Torus(Point3(-1, 0, -1), 0.3, 0.2, material_left))
 
 
 # image

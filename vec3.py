@@ -98,7 +98,12 @@ class Vec3:
     def near_zero(self):
         s = 1e-8
         return all(math.isclose(_, 0, abs_tol=s) for _ in self.e)
-        
+    
+    def refract(self, n, etai_over_etat: float):
+        cos_theta = min(-self.dot(n), 1.0)
+        r_out_perp: Vec3 = etai_over_etat * (self + cos_theta*n)
+        r_out_parallel = -math.sqrt(abs(1.0 - r_out_perp.length_squared())) * n
+        return r_out_perp + r_out_parallel
 
 Point3 = Vec3
 Color = Vec3 
