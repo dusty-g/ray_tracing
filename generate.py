@@ -1,9 +1,9 @@
 from camera import Camera
-from material import Dialectric, Lambertian, Material, Metal
+from material import Dielectric, Lambertian, Material, Metal
 from vec3 import Color, Point3, Vec3
 from ray import Ray
 from tqdm import tqdm
-from math import sqrt
+from math import sqrt, cos
 from hittable import Sphere, HittableList, Torus
 from rtweekend import infinity, pi, degrees_to_radians
 import random
@@ -32,13 +32,16 @@ def ray_color(ray: Ray, world: HittableList, depth: int):
 world = HittableList()
 material_ground = Lambertian(Color(0.8, 0.8, 0.0))
 material_center = Lambertian(Color(0.1, 0.2, 0.5))
-material_left = Dialectric(1.5)  # Assuming Dielectric class is already defined
+material_left = Dielectric(1.5) 
 material_right = Metal(Color(0.8, 0.6, 0.2), 0.0)
 
-world.add(Sphere(Point3(0, -100.5, -1), 100, material_ground))
-world.add(Sphere(Point3(0, 0, -1), 0.5, material_center))
-world.add(Sphere(Point3(-1, 0, -1), 0.5, material_left))
-world.add(Sphere(Point3(1, 0, -1), 0.5, material_right))
+world.add(Sphere(Point3(0.0, -100.5, -1.0), 100.0, material_ground))
+world.add(Sphere(Point3(0.0, 0.0, -1.0), 0.5, material_center))
+world.add(Sphere(Point3(-1.0, 0.0, -1.0), 0.5, material_left))
+world.add(Sphere(Point3(-1.0, 0.0, -1.0), -0.45, material_left))
+world.add(Sphere(Point3(1.0, 0.0, -1.0), 0.5, material_right))
+
+
 
 
 # image
@@ -49,7 +52,7 @@ samples_per_pixel = 100
 max_depth: int = 50
 
 # camera
-camera = Camera()
+camera = Camera(lookfrom=Point3(-2,2,1), lookat=Point3(0,0,-1), vup=Vec3(0,1,0), vfov=20)
 
 
 def render_row(width: int, height: int, samples_per_pixel: int, camera: Camera, world: HittableList, row: int) -> Tuple[int, List[Vec3]]:
