@@ -28,33 +28,65 @@ def ray_color(ray: Ray, world: HittableList, depth: int):
 
 
 
-# world
-world = HittableList()
-material_ground = Lambertian(Color(0.8, 0.8, 0.0))
-material_center = Lambertian(Color(0.1, 0.2, 0.5))
-material_left = Dielectric(1.5) 
-material_right = Metal(Color(0.8, 0.6, 0.2), 0.0)
 
-world.add(Sphere(Point3(0.0, -100.5, -1.0), 100.0, material_ground))
-world.add(Sphere(Point3(0.0, 0.0, -1.0), 0.5, material_center))
-world.add(Sphere(Point3(-1.0, 0.0, -1.0), 0.5, material_left))
-world.add(Sphere(Point3(-1.0, 0.0, -1.0), -0.45, material_left))
-world.add(Sphere(Point3(1.0, 0.0, -1.0), 0.5, material_right))
 
 
 
 
 # image
 aspect_ratio = 16.0 / 9.0
-image_width = 400
+image_width = 1200
 image_height = int(image_width / aspect_ratio)
 samples_per_pixel = 100
 max_depth: int = 50
 
 # camera
-camera = Camera(lookfrom=Point3(-2,2,1), lookat=Point3(0,0,-1), vup=Vec3(0,1,0), vfov=20)
+lookfrom = Point3(13,2,3)
+lookat = Point3(0,0,0)
+vup: Vec3 = Vec3(0,1,0)
+dist_to_focus = 10
+aperture = 0.1
+camera = Camera(lookfrom, lookat, vup,aperture, dist_to_focus, vfov=20)
 
 
+
+
+def random_scene()->HittableList:
+    world = HittableList()
+    ground_material = Lambertian(Color(0.5, 0.5, 0.5))
+    world.add(Sphere(Point3(0,-1000,0), 1000, ground_material))
+    for a in range(-11,11):
+        for b in range(-11,11):
+            choose_mat = random.random()
+            center: Point3 = Point3(a+0.9*random.random(),0.2,b+0.9*random.random())
+            if ((center - Point3(4, 0.2, 0)).length() > 0.9):
+                sphere_material: Material
+                if choose_mat < 0.8:
+                    # diffuse
+                    albedo = Color.random() * Color.random()
+                    sphere_material = Lambertian(albedo)
+                    world.add(Sphere(center, 0.2, sphere_material))
+                elif choose_mat < 0.95:
+                    # metal
+                    albedo = Color.random(0.5, 1)
+                    fuzz = random.uniform(0,0.5)
+                    sphere_material = Metal(albedo, fuzz)
+                    world.add(Sphere(center, 0.2, sphere_material))
+                else:
+                    # glass
+                    sphere_material = Dielectric(1.5)
+                    world.add(Sphere(center, 0.2, sphere_material))
+    material1: Material = Dielectric(1.5)
+    world.add(Sphere(Point3(0,1,0), 1.0, material1))
+
+    material2: Material = Lambertian(Color(0.4, 0.2, 0.1))
+    world.add(Sphere(Point3(-4, 1, 0), 1, material2))
+
+    material3: Material = Metal(Color(0.7, 0.6, 0.5), 0)
+    world.add(Sphere(Point3(4,1,0), 1, material3))
+    return world
+
+# world
 def render_row(width: int, height: int, samples_per_pixel: int, camera: Camera, world: HittableList, row: int) -> Tuple[int, List[Vec3]]:
     row_pixels = []
     for x in range(width):
@@ -68,7 +100,7 @@ def render_row(width: int, height: int, samples_per_pixel: int, camera: Camera, 
     return row, row_pixels
 
 def main():
-
+    world: HittableList = random_scene()
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(render_row, image_width, image_height, samples_per_pixel, camera, world, row) for row in range(image_height)]
         rendered_rows = [None for _ in range(image_height)]

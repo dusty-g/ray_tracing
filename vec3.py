@@ -91,6 +91,15 @@ class Vec3:
                 continue
             return candidate_point
     @staticmethod
+    def random_in_unit_disk():
+         while True:
+            candidate_point: Vec3 = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
+            if(candidate_point.length_squared() >= 1):
+                continue
+            return candidate_point
+    
+
+    @staticmethod
     def random_unit_vector():
         vector: Vec3 = Vec3.random_in_unit_sphere()
         return vector.unit_vector()
